@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ErrorLightJS Demo</title>
+    <script>
+        // Initialize ErrorLightJS
+        ErrorLightJS.init({
+            showDashboard: true,
+            enableNetworkMonitor: true,
+            maxErrors: 100
+        });
+
+        // Simulate a few errors
+        function generateErrors() {
+            // Uncaught error
+            setTimeout(() => {
+                nonExistentFunction();
+            }, 1000);
+
+            // Promise rejection
+            new Promise((_, reject) => reject("Something went wrong")).catch(() => {});
+
+            // Network error (fetching a non-existent resource)
+            fetch("https://example.com/non-existent")
+                .then(response => response.json())
+                .catch(error => console.error("Network Error:", error));
+
+            // Manual error tracking
+            try {
+                throw new Error("Manually triggered error!");
+            } catch (error) {
+                ErrorLightJS.trackError(error);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>ErrorLightJS Demo</h1>
+    <button onclick="generateErrors()">Generate Errors</button>
+
+    <div id="dashboard"></div>
+   
+    <script>
+        // Render the error dashboard
+        const dashboard = document.getElementById("dashboard");
+        setInterval(() => {
+            const errors = ErrorLightJS.getErrors();
+            dashboard.innerHTML = `
+                <h2>Error Dashboard</h2>
+                <pre>${JSON.stringify(errors, null, 2)}</pre>
+            `;
+        }, 1000);
+    </script>
+</body>
+</html>
